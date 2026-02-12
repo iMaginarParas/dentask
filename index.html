@@ -3,137 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dentask | Admin Dashboard</title>
+    <title>UC App Studio | WhatsApp Dash</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .nav-item:hover { background: #f8fafc; color: #4f46e5; }
-        .nav-item.active { background: #eef2ff; color: #4f46e5; border-right: 3px solid #4f46e5; }
-        .feature-card { transition: all 0.3s ease; }
-        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(229, 231, 235, 1); }
+        .loader { border-top-color: #2563eb; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-[#fcfcfd] text-slate-900">
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-4 md:p-8">
 
-    <div class="flex h-screen overflow-hidden">
+    <div class="w-full max-w-4xl flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">UC App Studio</h1>
+            <p class="text-xs text-green-600 font-mono uppercase tracking-widest">WhatsApp Business Intelligence</p>
+        </div>
+        <div id="status-badge" class="px-3 py-1 rounded-full bg-gray-200 text-gray-600 text-xs font-bold uppercase">Disconnected</div>
+    </div>
+
+    <div id="login-section" class="glass-card p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+        <div class="mb-6">
+            <div class="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">Connect Your WABA</h2>
+            <p class="text-gray-500 mt-2 text-sm">Sync your WhatsApp Business Account to view real-time message stats and health.</p>
+        </div>
         
-        <aside class="w-72 bg-white border-r border-slate-200 hidden lg:flex flex-col">
-            <div class="p-6 flex items-center gap-3">
-                <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-200">
-                    <i class="fas fa-terminal text-white text-sm"></i>
-                </div>
-                <h1 class="text-xl font-bold tracking-tight text-slate-800">Dentask</h1>
-            </div>
-            
-            <div class="px-4 py-2">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-4 mb-2">Platform Features</p>
-                <nav class="flex-1 overflow-y-auto max-h-[70vh] custom-scrollbar space-y-0.5" id="sidebar-nav">
-                    </nav>
-            </div>
+        <button onclick="launchWhatsAppSignup()" id="auth-btn" class="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-3">
+            <span>Connect with Facebook</span>
+        </button>
+        <p id="error-msg" class="text-red-500 text-xs mt-4 hidden"></p>
+    </div>
 
-            <div class="mt-auto p-4 border-t border-slate-100">
-                <div class="flex items-center gap-3 p-2">
-                    <img src="https://ui-avatars.com/api/?name=Paras+Gupta&background=4f46e5&color=fff" class="h-9 w-9 rounded-full">
-                    <div>
-                        <p class="text-xs font-bold text-slate-800">Paras Gupta</p>
-                        <p class="text-[10px] text-slate-500">Developer Account</p>
-                    </div>
-                </div>
+    <div id="dashboard-section" class="hidden w-full max-w-4xl space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-blue-500">
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Messages Sent</p>
+                <p id="stat-sent" class="text-3xl font-black text-gray-800 mt-1">0</p>
             </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto flex flex-col">
-            
-            <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-20">
-                <div class="relative w-full max-w-md">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="searchInput" placeholder="Search Dentask features..." 
-                        class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">
-                        <i class="fas fa-plus mr-2"></i> New Integration
-                    </button>
-                </div>
-            </header>
-
-            <div class="p-8 lg:p-12">
-                <header class="mb-10">
-                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">System Dashboard</h2>
-                    <p class="text-slate-500 mt-2">Welcome to the Dentask central command. Manage your AI agents and social flows below.</p>
-                </header>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" id="feature-grid">
-                    </div>
+            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Delivered</p>
+                <p id="stat-delivered" class="text-3xl font-black text-gray-800 mt-1">0</p>
             </div>
-        </main>
+            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-purple-500">
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Read Rate</p>
+                <p id="stat-read" class="text-3xl font-black text-gray-800 mt-1">0%</p>
+            </div>
+        </div>
+        <div class="glass-card p-6 rounded-2xl overflow-hidden">
+            <h3 class="font-bold text-gray-800 mb-2">Connected Account Details</h3>
+            <p id="acc-details" class="text-sm text-gray-600 mb-4 font-mono"></p>
+            <pre id="raw-output" class="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-x-auto">Waiting for data...</pre>
+        </div>
     </div>
 
     <script>
-        const dentaskFeatures = [
-            { id: 1, name: "WhatsApp Live Chat", icon: "fa-whatsapp", cat: "Channels", desc: "Native API integration for real-time customer support." },
-            { id: 2, name: "Instagram Management", icon: "fa-instagram", cat: "Social", desc: "Automate comments and manage DM workflows." },
-            { id: 3, name: "Facebook Live Management", icon: "fa-facebook", cat: "Social", desc: "Sync comments and chat from Facebook Pages." },
-            { id: 4, name: "Advanced Chatbot", icon: "fa-robot", cat: "Automation", desc: "Custom decision-tree logic for automated replies." },
-            { id: 5, name: "Visual Flow Builder", icon: "fa-project-diagram", cat: "Tools", desc: "Drag-and-drop interface for building message flows." },
-            { id: 6, name: "Meta Flow Integration", icon: "fa-infinity", cat: "Meta", desc: "Official Meta-embedded business workflow sync." },
-            { id: 7, name: "Chat Reports & Analytics", icon: "fa-chart-area", cat: "Data", desc: "Performance metrics and agent response times." },
-            { id: 8, name: "Google My Business", icon: "fa-store", cat: "Google", desc: "Sync business profiles and local chat requests." },
-            { id: 9, name: "Auto Review Reply", icon: "fa-magic", cat: "Google", desc: "AI-driven replies to GMB reviews and auto-posting." },
-            { id: 10, name: "Product Catalog Payments", icon: "fa-shopping-bag", cat: "Commerce", desc: "PhonePe & Razorpay integrated product checkouts." },
-            { id: 11, name: "Voice Chat Support", icon: "fa-microphone-alt", cat: "Channels", desc: "Transcribe and manage voice note interactions." },
-            { id: 12, name: "Google Sheets Integration", icon: "fa-file-excel", cat: "Data", desc: "Automated lead export to your spreadsheets." },
-            { id: 13, name: "AI Chatbot (GPT/Flowise)", icon: "fa-brain", cat: "Automation", desc: "LLM-powered intelligent conversational agents." },
-            { id: 14, name: "Multi-Agent Assignment", icon: "fa-user-friends", cat: "Team", desc: "Round-robin and manual chat routing to team." },
-            { id: 15, name: "Meta Embedded Signup", icon: "fa-bolt", cat: "Meta", desc: "One-click onboarding for new Meta accounts." },
-            { id: 16, name: "Carousel Templates", icon: "fa-clone", cat: "Design", desc: "Build rich media carousel message templates." },
-            { id: 17, name: "Activity Logs", icon: "fa-shield-alt", cat: "Security", desc: "Audit trails for every user and agent action." },
-            { id: 18, name: "WhatsApp Smart Labels", icon: "fa-tags", cat: "Leads", desc: "Categorize leads (Good/Bad) using smart filters." },
-            { id: 19, name: "High-Speed Bulk Upload", icon: "fa-file-upload", cat: "Tools", desc: "Process massive contact lists for broadcasts." },
-            { id: 20, name: "Log Management", icon: "fa-list-ul", cat: "Data", desc: "Proof of delivery, failed messages, and follow-ups." }
-        ];
+        const BACKEND_URL = "https://dentask-production.up.railway.app";
+        const CONFIG_ID = "846449218431910";
 
-        const sidebar = document.getElementById('sidebar-nav');
-        const grid = document.getElementById('feature-grid');
-        const search = document.getElementById('searchInput');
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '1416504326619315',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v21.0'
+            });
+        };
 
-        function render(filter = "") {
-            const filtered = dentaskFeatures.filter(f => f.name.toLowerCase().includes(filter.toLowerCase()));
-            
-            // Render Sidebar
-            sidebar.innerHTML = filtered.map(f => `
-                <a href="#" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 transition-all text-sm font-medium group">
-                    <i class="fas ${f.icon} w-5 text-center text-slate-400 group-hover:text-indigo-600"></i>
-                    <span class="truncate">${f.name}</span>
-                </a>
-            `).join('');
+        // Listen for Embedded Signup completion events
+        const embeddedSignupInfoListener = (event) => {
+            if (!event.origin.endsWith('facebook.com')) return;
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'WA_EMBEDDED_SIGNUP' && (data.event === 'FINISH' || data.event === 'FINISH_ONLY_WABA')) {
+                    const {phone_number_id, waba_id} = data.data;
+                    document.getElementById('acc-details').innerText = `WABA ID: ${waba_id} | Phone ID: ${phone_number_id}`;
+                }
+            } catch (e) { /* Non-JSON Responses */ }
+        };
+        window.addEventListener('message', embeddedSignupInfoListener);
 
-            // Render Grid
-            grid.innerHTML = filtered.map(f => `
-                <div class="feature-card bg-white border border-slate-200 p-6 rounded-2xl flex flex-col group cursor-pointer">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="w-12 h-12 bg-slate-50 text-slate-700 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                            <i class="fas ${f.icon} text-lg"></i>
-                        </div>
-                        <span class="text-[10px] font-bold py-1 px-2 bg-indigo-50 text-indigo-600 rounded-md uppercase tracking-wider">${f.cat}</span>
-                    </div>
-                    <h3 class="text-slate-800 font-bold mb-2 group-hover:text-indigo-600 transition-colors">${f.name}</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">${f.desc}</p>
-                    <div class="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="text-[11px] font-bold text-indigo-600 uppercase">Open Tool</span>
-                        <i class="fas fa-arrow-right text-indigo-600 text-xs"></i>
-                    </div>
-                </div>
-            `).join('');
+        function launchWhatsAppSignup() {
+            const btn = document.getElementById('auth-btn');
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader ease-linear rounded-full border-2 border-t-2 border-gray-200 h-5 w-5 mr-3"></div> Processing...`;
+
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    exchangeCodeForToken(response.authResponse.code);
+                } else {
+                    showError("User cancelled or did not authorize.");
+                    resetBtn();
+                }
+            }, {
+                config_id: CONFIG_ID,
+                response_type: 'code',
+                override_proxy_api_version: 'v21.0'
+            });
         }
 
-        search.addEventListener('input', (e) => render(e.target.value));
-        render(); // Initial load
+        async function exchangeCodeForToken(code) {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/auth/whatsapp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const data = await res.json();
+                if (res.ok) handleSuccess(data);
+                else showError(data.detail || "Auth failed");
+            } catch (err) {
+                showError("Could not reach Railway backend.");
+            } finally {
+                resetBtn();
+            }
+        }
+
+        function handleSuccess(data) {
+            document.getElementById('status-badge').innerText = "Connected";
+            document.getElementById('status-badge').className = "px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase";
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('raw-output').innerText = JSON.stringify(data, null, 2);
+        }
+
+        function showError(msg) {
+            const errEl = document.getElementById('error-msg');
+            errEl.innerText = msg;
+            errEl.classList.remove('hidden');
+        }
+
+        function resetBtn() {
+            const btn = document.getElementById('auth-btn');
+            btn.disabled = false;
+            btn.innerHTML = `Connect with Facebook`;
+        }
     </script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 </body>
 </html>
