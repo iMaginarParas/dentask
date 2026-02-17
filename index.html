@@ -1,147 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC App Studio | WhatsApp Dash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(229, 231, 235, 1); }
-        .loader { border-top-color: #2563eb; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC App Studio | WhatsApp Dash</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.glass-card { background: rgba(255,255,255,.95); backdrop-filter: blur(10px); }
+.loader { border-top-color:#2563eb; animation: spinner 1.5s linear infinite;}
+@keyframes spinner {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+</style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center p-4 md:p-8">
 
-    <div class="w-full max-w-4xl flex justify-between items-center mb-10">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">UC App Studio</h1>
-            <p class="text-xs text-green-600 font-mono uppercase tracking-widest">WhatsApp Business Intelligence</p>
-        </div>
-        <div id="status-badge" class="px-3 py-1 rounded-full bg-gray-200 text-gray-600 text-xs font-bold uppercase">Disconnected</div>
-    </div>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-8">
 
-    <div id="login-section" class="glass-card p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-        <div class="mb-6">
-            <div class="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-900">Connect Your WABA</h2>
-            <p class="text-gray-500 mt-2 text-sm">Sync your WhatsApp Business Account to view real-time message stats and health.</p>
-        </div>
-        
-        <button onclick="launchWhatsAppSignup()" id="auth-btn" class="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-3">
-            <span>Connect with Facebook</span>
-        </button>
-        <p id="error-msg" class="text-red-500 text-xs mt-4 hidden"></p>
-    </div>
+<div class="w-full max-w-4xl flex justify-between items-center mb-10">
+<h1 class="text-2xl font-bold">UC App Studio</h1>
+<div id="status-badge" class="px-3 py-1 rounded-full bg-gray-200 text-xs">Disconnected</div>
+</div>
 
-    <div id="dashboard-section" class="hidden w-full max-w-4xl space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-blue-500">
-                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Messages Sent</p>
-                <p id="stat-sent" class="text-3xl font-black text-gray-800 mt-1">0</p>
-            </div>
-            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
-                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Delivered</p>
-                <p id="stat-delivered" class="text-3xl font-black text-gray-800 mt-1">0</p>
-            </div>
-            <div class="glass-card p-6 rounded-2xl shadow-sm border-l-4 border-purple-500">
-                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider">Read Rate</p>
-                <p id="stat-read" class="text-3xl font-black text-gray-800 mt-1">0%</p>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-2xl overflow-hidden">
-            <h3 class="font-bold text-gray-800 mb-2">Connected Account Details</h3>
-            <p id="acc-details" class="text-sm text-gray-600 mb-4 font-mono"></p>
-            <pre id="raw-output" class="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-x-auto">Waiting for data...</pre>
-        </div>
-    </div>
+<div id="login-section" class="glass-card p-8 rounded-xl text-center max-w-md w-full">
+<h2 class="text-xl font-bold mb-4">Connect WhatsApp Business</h2>
 
-    <script>
-        const BACKEND_URL = "https://dentask-production.up.railway.app";
-        const CONFIG_ID = "846449218431910";
+<button onclick="launchWhatsAppSignup()" id="auth-btn"
+class="w-full bg-[#1877F2] text-white py-3 rounded-xl">
+Connect with Meta
+</button>
 
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId      : '1416504326619315',
-                cookie     : true,
-                xfbml      : true,
-                version    : 'v21.0'
+<p id="error-msg" class="text-red-500 text-xs mt-3 hidden"></p>
+</div>
+
+<div id="dashboard-section" class="hidden w-full max-w-4xl mt-10">
+<pre id="raw-output" class="bg-black text-green-400 p-4 text-xs"></pre>
+</div>
+
+<script>
+const BACKEND_URL = "https://dentask-production.up.railway.app";
+const CONFIG_ID = "846449218431910";
+
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: "1416504326619315",
+        cookie: true,
+        xfbml: true,
+        version: "v22.0"
+    });
+};
+
+function launchWhatsAppSignup() {
+
+    FB.login(function(response) {
+
+        if (response.authResponse) {
+            exchangeCodeForToken(response.authResponse.code);
+        } else {
+            showError("User cancelled login");
+        }
+
+    }, {
+        config_id: CONFIG_ID,
+        response_type: "code",
+        override_default_response_type: true,
+        extras: { setup: {} }
+    });
+}
+
+async function exchangeCodeForToken(code) {
+
+    const res = await fetch(`${BACKEND_URL}/api/auth/whatsapp`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ code })
+    });
+
+    const data = await res.json();
+    handleSuccess(data);
+}
+
+/* Capture embedded signup result */
+window.addEventListener("message", async function(event){
+
+    if(!event.origin.includes("facebook.com")) return;
+
+    try {
+        const data = JSON.parse(event.data);
+
+        if(data.type === "WA_EMBEDDED_SIGNUP" &&
+          (data.event === "FINISH" || data.event === "FINISH_ONLY_WABA")) {
+
+            const {phone_number_id, waba_id} = data.data;
+
+            await fetch(`${BACKEND_URL}/api/store-waba`, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({phone_number_id, waba_id})
             });
-        };
 
-        // Listen for Embedded Signup completion events
-        const embeddedSignupInfoListener = (event) => {
-            if (!event.origin.endsWith('facebook.com')) return;
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'WA_EMBEDDED_SIGNUP' && (data.event === 'FINISH' || data.event === 'FINISH_ONLY_WABA')) {
-                    const {phone_number_id, waba_id} = data.data;
-                    document.getElementById('acc-details').innerText = `WABA ID: ${waba_id} | Phone ID: ${phone_number_id}`;
-                }
-            } catch (e) { /* Non-JSON Responses */ }
-        };
-        window.addEventListener('message', embeddedSignupInfoListener);
-
-        function launchWhatsAppSignup() {
-            const btn = document.getElementById('auth-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader ease-linear rounded-full border-2 border-t-2 border-gray-200 h-5 w-5 mr-3"></div> Processing...`;
-
-            FB.login(function(response) {
-                if (response.authResponse) {
-                    exchangeCodeForToken(response.authResponse.code);
-                } else {
-                    showError("User cancelled or did not authorize.");
-                    resetBtn();
-                }
-            }, {
-                config_id: CONFIG_ID,
-                response_type: 'code',
-                override_proxy_api_version: 'v21.0'
-            });
         }
 
-        async function exchangeCodeForToken(code) {
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/auth/whatsapp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: code })
-                });
-                const data = await res.json();
-                if (res.ok) handleSuccess(data);
-                else showError(data.detail || "Auth failed");
-            } catch (err) {
-                showError("Could not reach Railway backend.");
-            } finally {
-                resetBtn();
-            }
-        }
+    } catch(e){}
+});
 
-        function handleSuccess(data) {
-            document.getElementById('status-badge').innerText = "Connected";
-            document.getElementById('status-badge').className = "px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase";
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('dashboard-section').classList.remove('hidden');
-            document.getElementById('raw-output').innerText = JSON.stringify(data, null, 2);
-        }
+function handleSuccess(data) {
 
-        function showError(msg) {
-            const errEl = document.getElementById('error-msg');
-            errEl.innerText = msg;
-            errEl.classList.remove('hidden');
-        }
+    document.getElementById("status-badge").innerText = "Connected";
+    document.getElementById("login-section").style.display="none";
+    document.getElementById("dashboard-section").style.display="block";
+    document.getElementById("raw-output").innerText =
+        JSON.stringify(data,null,2);
+}
 
-        function resetBtn() {
-            const btn = document.getElementById('auth-btn');
-            btn.disabled = false;
-            btn.innerHTML = `Connect with Facebook`;
-        }
-    </script>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+function showError(msg){
+    const el=document.getElementById("error-msg");
+    el.innerText=msg;
+    el.classList.remove("hidden");
+}
+</script>
+
+<script async defer crossorigin="anonymous"
+src="https://connect.facebook.net/en_US/sdk.js"></script>
+
 </body>
 </html>
